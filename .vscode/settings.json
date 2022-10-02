@@ -9,7 +9,8 @@
         "vfs.h": "c",
         "*.tcc": "c",
         "sstream": "c",
-        "printk.h": "c"
+        "printk.h": "c",
+        "graphics.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -4,21 +4,9 @@
 #include <stdbool.h>
 #include "MainMenu.h"
 
-#define Up 0x80 + 0x48
-#define Down 0x80 + 0x50
+bool MenuOpen = false;
 
-void MainMenuKeys(void){
-    uint8_t Scancode = Inb(0x60);
-    if (Scancode > 57) return;
-
-	if (Scancode == Up) {
-        TerminalWrite("UP\n");
-	} else if (Scancode == Down) {
-        TerminalWrite("DOWN\n");
-    }
+void CreateMenu(){
+    PutRect(0, 30, 45, 200, 0x03);
+    MenuOpen = true;
 }
-
-void MainMenu(){
-
-}
-

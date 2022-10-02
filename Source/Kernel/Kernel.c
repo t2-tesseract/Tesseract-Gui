@@ -16,22 +16,17 @@ void _start(){
             IdtInitGui();
             InitPic();
             EnableInterrupts;
-            MouseInstall();
             TerminalWrite("You are declared in GUI Mode!");
-            PutRect(0, 0, 320, 10, 0x03);
-            DrawString("Hello world!");
             MouseInstall();
             break;
         }
     }
 
-    while(1)
-    {
-        if(MouseGetStatus() & 0x1)
-        {
-            MouseHandler();
-        }
-    }
+	while(1){
+        MouseHandler();
+
+        
+	}
 
     return 0;
 }

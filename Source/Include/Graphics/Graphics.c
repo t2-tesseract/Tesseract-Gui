@@ -20,3 +20,9 @@ void PutRect(int X, int Y, int Width, int Height, unsigned char Color){
         }
     }
 }
+
+void DrawDesktop(){
+    PutRect(0, 0, 320, 200, 0x00);
+    PutRect(0, 0, 320, 10, 0x03);
+    PutRect(0, 0, 10, 10, 0x04);
+}

@@ -1,4 +1,7 @@
 #include <Include/TextMode/TextMode.h>
+#include <Include/Gui/MainMenu.h>
+
+extern int MouseX, MouseY;
 
 unsigned char MouseGetStatus();
 void MouseWait(unsigned char type);

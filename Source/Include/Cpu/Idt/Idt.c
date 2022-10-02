@@ -7,7 +7,7 @@
 void DefaultInt(void);
 void Irq0(void);
 void Irq1(void);
-void MainMenuAsm(void);
+void Irq12(void);
 
 struct IdtDescriptor{
 	uint16_t offset0_15;
@@ -33,13 +33,19 @@ void InitIdtDescriptor(uint16_t select, uint32_t offset, uint16_t type, struct I
 	return;
 }
 
+void MouseInt(void){
+	MouseHandler();
+}
+
 void IdtInitGui(void){
+	MouseInstall();
 	int i;
 
 	for (i = 0; i < IdtSize; i++) 
 		InitIdtDescriptor(0x08, (uint32_t) DefaultInt, IdtGate, &KernelIdt[i]);
 
 	InitIdtDescriptor(0x08, (uint32_t) Irq0, IdtGate, &KernelIdt[32]); // Clock
+	InitIdtDescriptor(0x08, (uint32_t) Irq12, IdtGate, &KernelIdt[44]); // Mouse
 
 	KernelIdtPointer.limit = IdtSize * 8;
 	KernelIdtPointer.base = IdtBase;
