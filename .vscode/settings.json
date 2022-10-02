@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "stddef.h": "c",
+        "stdint.h": "c",
+        "stdarg.h": "c",
+        "stdbool.h": "c",
+        "textmode.h": "c",
+        "common.h": "c",
+        "vfs.h": "c",
+        "*.tcc": "c",
+        "sstream": "c",
+        "printk.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}
