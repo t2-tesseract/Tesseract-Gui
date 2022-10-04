@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "Mouse.h"
 
+static char MouseBytes[3];
 int MouseX, MouseY;
 
 unsigned char MouseGetStatus()
@@ -78,7 +79,6 @@ void MouseInstall()
 }
 void MouseHandler(){
 	static unsigned char Cycle = 0;
-	static char MouseBytes[3];
 
 	MouseBytes[Cycle++] = Inb(0x60);
 
@@ -95,38 +95,40 @@ void MouseHandler(){
 		if(MouseY >= 200) MouseY = 200 - 1;
         
 		PutRect(MouseX, MouseY, 3, 3, 0x04);
-
-        if (MouseX < 15){
-            if (MouseY < 15){
-                if (MouseBytes[0] & 0b00000001){
+        if (MouseBytes[0] & 0b00000001){
+            if (MouseX < 15){
+                if (MouseY < 15){
                     MenuOpen = true;
                     CreateMenu();
-                }  
+                }
             }
         }
+
+        if (MouseBytes[0] & 0b00000001){
+            if (MouseX < 45){
+                if (MouseY > 30){
+                    MenuOpen = false;
+                    // CreateMenu();
+                }
+            }
+        }
+
+        // if (MouseBytes[0] & 0b00000001){
+        //     if (MouseY < 30){
+        //         MenuOpen = false;
+        //         DrawDesktop();
+        //         // break;
+        //     }
+        //     // }
+        // }
 
         if (MouseBytes[0] & 0b00000001){
             DrawString("Click", 280, 180, 0x0F);
         }
 
-        if (MenuOpen == true){
-            while(1){
-                Delay(100);
-                DrawDesktop();
-                CreateMenu();
-                PutRect(0, 30, 45, 25, 0x0C);
-                if (MouseBytes[0] & 0b00000001){
-                    // if (MouseX < 30){
-                        if (MouseY < 30){
-                            MenuOpen = false;
-                            DrawDesktop();
-                            break;
-                        }
-                }
-            }
-        } else {
-            Delay(100);
-            DrawDesktop();
-        }
+        Delay(100);
+        DrawDesktop();
+
 	}
 }
+

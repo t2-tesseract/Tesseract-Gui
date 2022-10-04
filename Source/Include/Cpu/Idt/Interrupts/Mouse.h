@@ -1,6 +1,7 @@
 #include <Include/TextMode/TextMode.h>
 #include <Include/Gui/MainMenu.h>
 
+static char MouseBytes[3];
 extern int MouseX, MouseY;
 
 unsigned char MouseGetStatus();

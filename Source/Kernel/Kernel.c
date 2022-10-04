@@ -25,7 +25,32 @@ void _start(){
 	while(1){
         MouseHandler();
 
-        
+        if (MenuOpen == true){
+            // while(1){
+                // Delay(100);
+                // DrawDesktop();
+            CreateMenu();
+            PutRect(0, 30, 45, 25, 0x0C);
+            // if (MouseBytes[0] & 0b00000001){
+            //     if (MouseX < 15){
+            //         if (MouseY < 15){
+            //             MenuOpen = false;
+            //             DrawDesktop();
+            //             break;
+            //         }
+            //     }
+            // }
+        }
+
+        if (MenuOpen == false){
+            DrawDesktop();
+            // break;
+        }
+
+        // } else {
+        //     Delay(100);
+        //     DrawDesktop();
+        // }
 	}
 
     return 0;
