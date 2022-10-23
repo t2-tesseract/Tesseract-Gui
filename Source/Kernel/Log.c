@@ -11,13 +11,6 @@ void Start(){
 	InitPic();
     InitDynamicMem();
 
-    TerminalClear();
-
 	DebugWrite("GDT Loaded.\n", 0, true);
 	DebugWrite("IDT Loaded.\n\n", 0, true);
-
-	TerminalShell();
-
-	EnableInterrupts;
-    
 }

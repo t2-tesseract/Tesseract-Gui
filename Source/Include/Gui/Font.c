@@ -906,7 +906,6 @@ uint8_t Font[] = {
     0xff, 0xff, 0xff, 0xff
 };
 
-
 typedef struct {
     uint8_t magic[2];
     uint8_t mode;

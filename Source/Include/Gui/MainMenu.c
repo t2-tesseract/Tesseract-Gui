@@ -7,6 +7,6 @@
 bool MenuOpen = false;
 
 void CreateMenu(){
-    PutRect(0, 30, 45, 200, 0x03);
+    PutRect(0, 30, 45, 200, 0x007F9A);
     MenuOpen = true;
 }

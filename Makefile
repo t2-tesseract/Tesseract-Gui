@@ -1,39 +1,49 @@
 SRCS := $(shell find Source/ -name '*.c') 
 OBJS := $(SRCS:.c=.o)
 
+.SUFFIXE: .c
 %.o: %.c
-	gcc -g -ffreestanding -ISource/ -Wall -Wextra -fno-exceptions -fno-stack-protector -m32 -fno-pie -c $< -o $@
+	i686-elf-gcc -ISource -ffreestanding -g -c $< -o $@
 
-Kernel.bin: KernelEntry.o Interrupts.o X86.o $(OBJS)
-	ld -o $@ -Ttext 0x1000 $^ --oformat binary -m elf_i386
+Kernel.elf: $(OBJS)
+	make asm
+	i686-elf-gcc -std=gnu99 -ISource/ -ffreestanding -nostdlib -T Source/Linker.ld $(OBJS) Boot.o X86.o Interrupts.o -o $@ -lgcc
 
-OSImage.img: Boot.bin Kernel.bin
-	# cat $^ > OS.img
-	cat Boot.bin Kernel.bin | dd of=OS.img bs=512 conv=notrunc
-	dd if=/dev/zero of=OSImage.img bs=512 count=2880
-	mkfs.fat -F 12 -n "DISK" OSImage.img
-	dd if=OS.img of=OSImage.img conv=notrunc
-	# mcopy -i OSImage.img Kernel.bin "::Kernel.bin"
-
-Boot.bin:
-	nasm Bootloader/Main.asm -f bin -o Boot.bin
-
-KernelEntry.o:
-	nasm Source/Kernel/KernelEntry.asm -f elf -o KernelEntry.o
-
-Interrupts.o:
-	nasm Source/Include/Cpu/Idt/Interrupts.asm -f elf32 -o Interrupts.o
-
-X86.o:
-	nasm Source/Include/X86/X86.asm -f elf32 -o X86.o
-
-run: OSImage.img
-	qemu-system-i386 -debugcon stdio -fda OSImage.img
+Kernel.bin: $(OBJS)
+	make asm
+	i686-elf-gcc -std=gnu99 ISource/ -ffreestanding -nostdlib -T Source/Linker.ld $(OBJS) Boot.o X86.o Interrupts.o -o $@ -lgcc
 
 clean:
-	rm *.bin
-	rm *.o
-	rm *.img
-	rm *.iso
-	rm Source/Include/Vfs/Vfs.o
-	rm $(OBJS)
+	rm -f $(OBJS)
+	rm -f Root/boot/Kernel.elf
+	rm -f *.o
+	rm -f *.elf
+	rm -f *.iso
+
+iso:
+	cp Kernel.elf Root/boot/
+	grub-mkrescue Root -o Tesseract.iso
+
+git:
+	git add .
+	git commit
+	git push -f origin
+
+asm:
+	# i686-elf-gcc -std=gnu99 -ffreestanding -g -c Source/Boot/Boot.s -o Boot.o
+	nasm -f elf Source/Boot/Boot.asm -o Boot.o
+	nasm Source/Include/Cpu/Idt/Interrupts.asm -f elf32 -o Interrupts.o
+	nasm Source/Include/X86/X86.asm -f elf32 -o X86.o
+
+run: $(KERNEL_DISK)
+	make iso
+	qemu-system-i386 -m 256M -enable-kvm -cdrom ./Tesseract.iso
+
+debug:
+	qemu-system-i386 -cdrom Tesseract.iso -s -S &
+	gdb
+	target remote localhost:1234
+	symbol-file Kernel.elf
+
+bochs:
+	bochs

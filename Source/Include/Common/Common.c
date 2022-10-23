@@ -202,20 +202,31 @@ void Append(char s[], char n){
 }
 
 void InitPic(void){
-	Outb(0x20, 0x11);
-	Outb(0xA0, 0x11);
+	uint8_t A1, A2;
 
-	Outb(0x21, 0x20);
-	Outb(0xA1, 0x70);
+    A1 = Inb(PIC1_DATA);
+    A2 = Inb(PIC2_DATA);
 
-	Outb(0x21, 0x04);
-	Outb(0xA1, 0x02);
+    Outb(PIC1_COMMAND, ICW1);
+    Outb(PIC2_COMMAND, ICW1);
 
-	Outb(0x21, 0x01);
-	Outb(0xA1, 0x01);
+    Outb(PIC1_DATA, 0x20);
+    Outb(PIC2_DATA, 0x28);
 
-	Outb(0x21, 0x0);
-	Outb(0xA1, 0x0);
+    Outb(PIC1_DATA, 4);
+    Outb(PIC2_DATA, 2);
+
+    Outb(PIC1_DATA, ICW4_8086);
+    Outb(PIC2_DATA, ICW4_8086);
+
+    Outb(PIC1_DATA, A1);
+    Outb(PIC2_DATA, A2);
+}
+
+void EoiPic(uint8_t Irq){
+	if(Irq >= 0x28)
+        Outb(0xA0, 0x20);
+    Outb(0x20, 0x20);
 }
 
 bool IsLower(char chr){
