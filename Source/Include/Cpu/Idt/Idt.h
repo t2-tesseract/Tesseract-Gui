@@ -11,5 +11,5 @@
 struct IdtDescriptor;
 struct IdtPointer;
 
-void InitIdtDescriptor(uint16_t, uint32_t, uint16_t, struct IdtDescriptor*);
+void InitIdtDescriptor(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags);
 void InitIdt(void);

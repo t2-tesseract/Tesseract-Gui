@@ -6,10 +6,7 @@
 #include "Log.h"
 
 void Start(){
-    InitGdt();
-	InitIdt();
-	InitPic();
-    InitDynamicMem();
+    
 
 	DebugWrite("GDT Loaded.\n", 0, true);
 	DebugWrite("IDT Loaded.\n\n", 0, true);

@@ -1,30 +1,27 @@
-extern IsrIrqHandler
+extern IrqHandler
 
-IrqHandler:
-    pusha                 ; push all registers
-    mov ax, ds
-    push eax              ; save ds
-
-    mov ax, 0x10          ; load kernel data segment
+IrqCommonStub:
+    pusha
+    push ds
+    push es
+    push fs
+    push gs
+    mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-
-    push esp
-    call IsrIrqHandler
-    pop esp
-
-    pop ebx                ; restore kernel data segment
-    mov ds, bx
-    mov es, bx
-    mov fs, bx
-    mov gs, bx
-
-    popa                ; restore all registers
-    add esp, 0x8        ; restore stack for erro no been pushed
-
-    sti                 ; re-enable interrupts
+    mov eax, esp
+    push eax
+    mov eax, IrqHandler
+    call eax
+    pop eax
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popa
+    add esp, 8
     iret
 
 
@@ -34,7 +31,7 @@ IrqHandler:
     cli
     push byte 0
     push byte %2
-    jmp IrqHandler
+    jmp IrqCommonStub
 %endmacro
 
 
@@ -55,7 +52,7 @@ Irq 13, 45
 Irq 14, 46
 Irq 15, 47
 
-extern IsrExceptionHandler
+extern FaultHandler
 global Exception0
 global Exception1
 global Exception2
@@ -88,32 +85,29 @@ global Exception28
 global Exception29
 global Exception30
 global Exception31
-global Exception128
-
 
 ExceptionHandler:
-    pusha                 ; push all registers
-    mov ax, ds
-    push eax              ; save ds
-    
-    mov ax, 0x10          ; load kernel data segment
+    pusha
+    push ds
+    push es
+    push fs
+    push gs
+    mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-
-    call IsrExceptionHandler
-
-    pop ebx             ; restore kernel data segment
-    mov ds, bx
-    mov es, bx
-    mov fs, bx
-    mov gs, bx
-
-    popa                ; restore all registers
-    add esp, 0x8        ; restore stack for erro no been pushed
-
-    sti                 ; re-enable interrupts
+    mov eax, esp
+    push eax
+    mov eax, FaultHandler
+    call eax
+    pop eax
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popa
+    add esp, 8
     iret
 
 
@@ -334,12 +328,4 @@ Exception31:
     push byte 0     ; store default err code(0)
     push 31          ; push exception number index in IDT
     jmp ExceptionHandler
-
-
-Exception128:
-    cli
-    push byte 0     ; store default err code(0)
-    push 128          ; push exception number index in IDT
-    jmp ExceptionHandler
-
 

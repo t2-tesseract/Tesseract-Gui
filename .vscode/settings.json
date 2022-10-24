@@ -10,7 +10,12 @@
         "*.tcc": "c",
         "sstream": "c",
         "printk.h": "c",
-        "graphics.h": "c"
+        "graphics.h": "c",
+        "bootinfo.h": "c",
+        "keyboard.h": "c",
+        "isr.h": "c",
+        "font.h": "c",
+        "mouse.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

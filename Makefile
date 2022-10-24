@@ -7,11 +7,11 @@ OBJS := $(SRCS:.c=.o)
 
 Kernel.elf: $(OBJS)
 	make asm
-	i686-elf-gcc -std=gnu99 -ISource/ -ffreestanding -nostdlib -T Source/Linker.ld $(OBJS) Boot.o X86.o Interrupts.o -o $@ -lgcc
+	i686-elf-gcc -std=gnu99 -ISource/ -ffreestanding -nostdlib -T Source/Linker.ld $(OBJS) Boot.o Idt.o Interrupts.o -o $@ -lgcc
 
 Kernel.bin: $(OBJS)
 	make asm
-	i686-elf-gcc -std=gnu99 ISource/ -ffreestanding -nostdlib -T Source/Linker.ld $(OBJS) Boot.o X86.o Interrupts.o -o $@ -lgcc
+	i686-elf-gcc -std=gnu99 ISource/ -ffreestanding -nostdlib -T Source/Linker.ld $(OBJS) Boot.o Idt.o Interrupts.o -o $@ -lgcc
 
 clean:
 	rm -f $(OBJS)
@@ -33,11 +33,11 @@ asm:
 	# i686-elf-gcc -std=gnu99 -ffreestanding -g -c Source/Boot/Boot.s -o Boot.o
 	nasm -f elf Source/Boot/Boot.asm -o Boot.o
 	nasm Source/Include/Cpu/Idt/Interrupts.asm -f elf32 -o Interrupts.o
-	nasm Source/Include/X86/X86.asm -f elf32 -o X86.o
+	nasm Source/Include/Cpu/Idt/Idt.asm -f elf32 -o Idt.o
 
 run: $(KERNEL_DISK)
 	make iso
-	qemu-system-i386 -m 256M -enable-kvm -cdrom ./Tesseract.iso
+	qemu-system-i386 -m 2048M -enable-kvm -cdrom ./Tesseract.iso
 
 debug:
 	qemu-system-i386 -cdrom Tesseract.iso -s -S &

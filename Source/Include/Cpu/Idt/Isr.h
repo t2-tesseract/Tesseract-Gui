@@ -1,22 +1,26 @@
+#ifndef ISR_H
+#define ISR_H
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-#define NO_INTERRUPT_HANDLERS    256
-
 typedef struct {
-    uint32_t ds;
-    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;  // pushed by pusha
-    uint32_t int_no, err_code;                        // interrupt number and error code
-    uint32_t eip, cs, eflags, useresp, ss;            // pushed by the processor automatically
+    unsigned int gs, fs, es, ds;
+    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    unsigned int int_no, err_code;
+    unsigned int eip, cs, eflags, useresp, ss;
 } Registers;
 
-typedef void (*Isr)(Registers *);
+void FaultHandler(Registers *r);
+void IrqHandler(Registers *r);
+void InitIsr();
+void InitIrq();
 
-void IsrRegisterInterruptHandler(int num, Isr handler);
-void IsrEndInterrupt(int num);
-void IsrExeceptionHandler(Registers reg);
-void IsrIrqHandler(Registers *reg);
+void IrqInstallHandler(int irq, void (*handler)(Registers *r));
+void IrqUninstallHandler(int irq);
+
+void TimerInstall();
 
 extern void Exception0();
 extern void Exception1();
@@ -50,7 +54,6 @@ extern void Exception28();
 extern void Exception29();
 extern void Exception30();
 extern void Exception31();
-extern void Exception128();
 
 extern void Irq0();
 extern void Irq1();
@@ -86,3 +89,5 @@ extern void Irq15();
 #define IRQ13_FPU           0x0D
 #define IRQ14_HARD_DISK     0x0E
 #define IRQ15_RESERVED      0x0F
+
+#endif

@@ -1,9 +1,10 @@
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <Include/Cpu/Idt/Isr.h>
 #include "Mouse.h"
+
+bool OpenMenu = false;
 
 int MouseX = 0, MouseY = 0;
 MouseStatus g_Status;
@@ -92,16 +93,44 @@ void MouseHandler(Registers *r) {
                 MouseX = 0;
             if (MouseY < 0)
                 MouseY = 0;
-            // if (MouseX > VGA_MAX_WIDTH)
-            //     MouseX = VGA_MAX_WIDTH - 1;
-            // if (MouseY > VGA_MAX_HEIGHT)
-            //     MouseY = VGA_MAX_HEIGHT - 1;
+            if (MouseX > 1280)
+                MouseX = 1280 - 1;
+            if (MouseY > 720)
+                MouseY = 720 - 1;
 
+            // PutGradient(0, 0, 1280, 720, 0xD600A7, 0x0085FF);
+            // DrawDesktop();
+            Clear(0x000000);
             PutRect(MouseX, MouseY, 10, 10, 0xFF0000);
+            DrawString("Left click on the button to show a gradient and right click to hide gradient", 150, 150, 0xFFFFFF);
+            VerifClick();
+
+            if (OpenMenu){
+                PutGradient(45, 45, 45, 45, 0x00FF00, 0xFF0000);
+            } else {
+
+            }
+
             MouseCycle = 0;
             break;
     }
-    IsrEndInterrupt(0x800 + 12);
+    // IrqUninstallHandler(0x800 + 12);
+}
+
+void VerifClick(){
+    if (g_Status.left_button) {
+        if (MouseX > 10){
+            if (MouseY > 10){
+                if (MouseX < 105){
+                    if (MouseY < 26){
+                        OpenMenu = true;
+                    }
+                }
+            }
+        }
+    } else if (g_Status.right_button) {
+        OpenMenu = false;
+    }
 }
 
 /**
@@ -135,10 +164,10 @@ void MouseInit() {
     // print mouse id
     Outb(MOUSE_DATA_PORT, MOUSE_CMD_MOUSE_ID);
     status = MouseRead();
-    SetMouseRate(100);
+    SetMouseRate(80);
 
-    //outportb(MOUSE_DATA_PORT, MOUSE_CMD_RESOLUTION);
-    //outportb(MOUSE_DATA_PORT, 0);
+    Outb(MOUSE_DATA_PORT, MOUSE_CMD_RESOLUTION);
+    Outb(MOUSE_DATA_PORT, 0);
 
     // enable the interrupt
     MouseWait(true);
@@ -163,5 +192,5 @@ void MouseInit() {
     }
 
     // set mouse handler
-    IsrRegisterInterruptHandler(0x800 + 12, MouseHandler);
+    IrqInstallHandler(12, MouseHandler);
 }
