@@ -15,7 +15,9 @@
         "keyboard.h": "c",
         "isr.h": "c",
         "font.h": "c",
-        "mouse.h": "c"
+        "mouse.h": "c",
+        "taskbar.h": "c",
+        "terminal.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

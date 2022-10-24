@@ -4,14 +4,72 @@
 #include <Boot/BootInfo.h>
 #include "Graphics.h"
 
+bool MouseDrawn;
+uint32_t MouseCursorBuffer[16 * 16];
+uint32_t MouseCursorBufferAfter[16 * 16];
+
 void PutPixel(int X, int Y, unsigned int Color){
     unsigned *line = (unsigned *)(MBInfo->framebuffer_addr + Y * MBInfo->framebuffer_pitch);
     line[X] = Color;
 }
 
+int GetPixel(int X, int Y){
+    unsigned *line = (unsigned *)(MBInfo->framebuffer_addr + Y * MBInfo->framebuffer_pitch);
+    return line[X];
+}
+
 void PutRgb(int X, int Y, unsigned int Red, unsigned int Green, unsigned int Blue){
     unsigned *line = (unsigned *)(MBInfo->framebuffer_addr + Y * MBInfo->framebuffer_pitch);
     line[X] = (Red << 16) | (Green << 8) | Blue;
+}
+
+void ClearMouse(uint8_t* Image, int X, int Y){
+    if (!MouseDrawn) return;
+
+    int xMax = 16;
+    int yMax = 16;
+    int differenceX = 1280 - X;
+    int differenceY = 720 - Y;
+
+    if (differenceX < 16) xMax = differenceX;
+    if (differenceY < 16) yMax = differenceY;
+
+    for (int y = 0; y < yMax; y++){
+        for (int x = 0; x < xMax; x++){
+            int bit = y * 16 + x;
+            int byte = bit / 8;
+            if ((Image[byte] & (0b10000000 >> (x % 8))))
+            {
+                if (GetPixel(X + x, Y + y) == MouseCursorBufferAfter[x + y *16]){
+                    PutPixel(X + x, Y + y, MouseCursorBuffer[x + y * 16]);
+                }
+            }
+        }
+    }
+}
+
+void DrawMouse(uint8_t* Image, int X, int Y, unsigned int Color){
+    int xMax = 16;
+    int yMax = 16;
+    int differenceX = 1280 - X;
+    int differenceY = 720 - Y;
+
+    if (differenceX < 16) xMax = differenceX;
+    if (differenceY < 16) yMax = differenceY;
+
+    for (int y = 0; y < yMax; y++){
+        for (int x = 0; x < xMax; x++){
+            int bit = y * 16 + x;
+            int byte = bit / 8;
+            if ((Image[byte] & (0b10000000 >> (x % 8)))){
+                MouseCursorBuffer[x + y * 16] = GetPixel(X + x, Y + y);
+                PutPixel(X + x, Y + y, Color);
+                MouseCursorBufferAfter[x + y * 16] = GetPixel(X + x, Y + y);
+            }
+        }
+    }
+
+    MouseDrawn = true;
 }
 
 void Clear(unsigned Color){

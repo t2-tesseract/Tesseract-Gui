@@ -156,7 +156,7 @@ void TimeHandler(Registers* r){
     TimerTicks++;
     if (TimerTicks % 18 == 0)
     {
-        DrawString("Tick!", 15, 15, 0xFFFFFF);
+        // DrawString("Tick!", 15, 15, 0xFFFFFF);
     }
 }
 

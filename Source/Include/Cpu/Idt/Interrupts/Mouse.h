@@ -17,7 +17,7 @@
 #define PS2_CMD_PORT      0x64
 #define MOUSE_DATA_PORT     0x60
 
-extern bool OpenMenu;
+extern bool TerminalOpen;
 
 typedef struct {
     uint8_t left_button: 1;

@@ -2,11 +2,33 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <Include/Cpu/Idt/Isr.h>
+#include <Include/Applications/Terminal.h>
+#include <Include/Cpu/Idt/Interrupts/Keyboard/Keyboard.h>
 #include "Mouse.h"
 
-bool OpenMenu = false;
+uint8_t MousePointer[] = {
+    0b11111111, 0b11100000,
+    0b11111111, 0b10000000,
+    0b11111110, 0b00000000,
+    0b11111100, 0b00000000,
+    0b11111000, 0b00000000,
+    0b11110000, 0b00000000,
+    0b11100000, 0b00000000,
+    0b11000000, 0b00000000,
+    0b11000000, 0b00000000,
+    0b10000000, 0b00000000,
+    0b10000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+};
+
+bool TerminalOpen = false;
 
 int MouseX = 0, MouseY = 0;
+int MouseXOld = 0, MouseYOld = 0;
 MouseStatus g_Status;
 
 int MouseGetX() {
@@ -20,7 +42,7 @@ int MouseGetY() {
 void MouseWait(bool type) {
     uint32_t Timeout = 100000;
     if (type == false) {
-        // suspend until status is 1
+
         while (Timeout--) {
             if ((Inb(PS2_CMD_PORT) & 1) == 1) {
                 return;
@@ -37,11 +59,10 @@ void MouseWait(bool type) {
 }
 
 void MouseWrite(uint8_t data) {
-    // sending write command
     MouseWait(true);
     Outb(PS2_CMD_PORT, 0xD4);
     MouseWait(true);
-    // finally write data to port
+
     Outb(MOUSE_DATA_PORT, data);
 }
 
@@ -98,39 +119,54 @@ void MouseHandler(Registers *r) {
             if (MouseY > 720)
                 MouseY = 720 - 1;
 
-            // PutGradient(0, 0, 1280, 720, 0xD600A7, 0x0085FF);
-            // DrawDesktop();
-            Clear(0x000000);
-            PutRect(MouseX, MouseY, 10, 10, 0xFF0000);
-            DrawString("Left click on the button to show a gradient and right click to hide gradient", 150, 150, 0xFFFFFF);
-            VerifClick();
-
-            if (OpenMenu){
-                PutGradient(45, 45, 45, 45, 0x00FF00, 0xFF0000);
+            if (TerminalOpen){
+                
             } else {
 
             }
 
+            ClearMouse(MousePointer, MouseXOld, MouseYOld);
+            DrawMouse(MousePointer, MouseX, MouseY, 0x000000);
+            VerifClick();
+
+            MouseXOld = MouseX;
+            MouseYOld = MouseY;
             MouseCycle = 0;
             break;
     }
-    // IrqUninstallHandler(0x800 + 12);
 }
 
 void VerifClick(){
-    if (g_Status.left_button) {
-        if (MouseX > 10){
-            if (MouseY > 10){
-                if (MouseX < 105){
-                    if (MouseY < 26){
-                        OpenMenu = true;
+    if (g_Status.left_button){
+        if (MouseX > 3){
+            if (MouseY > 3){
+                if (MouseX < 33){
+                    if (MouseY < 33){
+                        TerminalOpen = true;
+                        ShowTerminal();
+                KeyboardInstall();
                     }
                 }
             }
         }
-    } else if (g_Status.right_button) {
-        OpenMenu = false;
+    
+    if (g_Status.left_button){
+        if (MouseX > 1222){
+            if (MouseY > 40){
+                if (MouseX < 1238){
+                    if (MouseY < 52){
+                        TerminalOpen = false;
+                        PutGradient(0, 0, 1280, 720, 0xD600A7, 0x0085FF);
+                        DrawTaskbar();
+                    }
+                }
+            }
+        }
     }
+    }
+    // } else if (g_Status.right_button) {
+    //     OpenMenu = false;
+    // }
 }
 
 /**
@@ -157,11 +193,9 @@ void MouseInit() {
     MouseX = 5;
     MouseY = 2;
 
-    // enable mouse device
     MouseWait(true);
     Outb(PS2_CMD_PORT, 0xA8);
 
-    // print mouse id
     Outb(MOUSE_DATA_PORT, MOUSE_CMD_MOUSE_ID);
     status = MouseRead();
     SetMouseRate(80);
@@ -169,28 +203,25 @@ void MouseInit() {
     Outb(MOUSE_DATA_PORT, MOUSE_CMD_RESOLUTION);
     Outb(MOUSE_DATA_PORT, 0);
 
-    // enable the interrupt
     MouseWait(true);
     Outb(PS2_CMD_PORT, 0x20);
     MouseWait(false);
-    // get and set second bit
+
     status = (Inb(MOUSE_DATA_PORT) | 2);
-    // write status to port
+
     MouseWait(true);
     Outb(PS2_CMD_PORT, MOUSE_DATA_PORT);
     MouseWait(true);
     Outb(MOUSE_DATA_PORT, status);
 
-    // set mouse to use default settings
     MouseWrite(MOUSE_CMD_SET_DEFAULTS);
     status = MouseRead();
-    // enable packet streaming to receive
+
     MouseWrite(MOUSE_CMD_ENABLE_PACKET_STREAMING);
     status = MouseRead();
     if(status != MOUSE_ACKNOWLEDGE) {
         return;
     }
 
-    // set mouse handler
     IrqInstallHandler(12, MouseHandler);
 }

@@ -8,6 +8,7 @@
 #include <Include/Cpu/Idt/Interrupts/Keyboard/Keyboard.h>
 #include <Include/Graphics/Graphics.h>
 #include <Include/Gui/Wm.h>
+#include <Include/Gui/Taskbar.h>
 #include <Include/Vfs/Vfs.h>
 #include <Include/Common/Common.h>
 #include <Include/Cpu/Idt/Interrupts/Mouse.h>
@@ -25,6 +26,10 @@ void _start(multiboot_info_t* MBootInfo){
      
     InitDynamicMem();
 
+    PutGradient(0, 0, 1280, 720, 0xD600A7, 0x0085FF);
+
+    DrawTaskbar();
+
     TimerInstall();
     KeyboardInstall();
     InitPic();
@@ -32,8 +37,6 @@ void _start(multiboot_info_t* MBootInfo){
     __asm__ __volatile__ ("sti");
 
     while(1){
-        struct Button* Button;
-        SetupButton(&Button, 10, 10, 75, 16, "Click");
-        RenderButton(&Button);
+        
     }
 }
