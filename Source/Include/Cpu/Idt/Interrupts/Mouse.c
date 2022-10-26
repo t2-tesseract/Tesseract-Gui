@@ -125,6 +125,10 @@ void MouseHandler(Registers *r) {
 
             }
 
+            // CEST LA QUE CA FLICK
+            PutGradient(0, 0, 1280, 720, 0xD600A7, 0x0085FF);
+            DrawTaskbar();
+
             ClearMouse(MousePointer, MouseXOld, MouseYOld);
             DrawMouse(MousePointer, MouseX, MouseY, 0x000000);
             VerifClick();
@@ -144,7 +148,7 @@ void VerifClick(){
                     if (MouseY < 33){
                         TerminalOpen = true;
                         ShowTerminal();
-                KeyboardInstall();
+                        KeyboardInstall();
                     }
                 }
             }
@@ -155,7 +159,7 @@ void VerifClick(){
             if (MouseY > 40){
                 if (MouseX < 1238){
                     if (MouseY < 52){
-                        TerminalOpen = false;
+                        // TerminalOpen = false;
                         PutGradient(0, 0, 1280, 720, 0xD600A7, 0x0085FF);
                         DrawTaskbar();
                     }

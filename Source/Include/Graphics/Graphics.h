@@ -3,7 +3,15 @@
 #include <stdbool.h>
 #include <Include/Common/Common.h>
 
+extern unsigned short ScreenW;
+extern unsigned short ScreenH;
+extern uint32_t *BackBuffer;
+extern unsigned char PixelStride;
+extern int Pitch;
+
 void PutPixel(int X, int Y, unsigned int Color);
+void SetPixel(unsigned short X, unsigned short Y, unsigned Colour);
+void Update();
 int GetPixel(int X, int Y);
 void PutRgb(int X, int Y, unsigned int Red, unsigned int Green, unsigned int Blue);
 void ClearMouse(uint8_t* Image, int X, int Y);

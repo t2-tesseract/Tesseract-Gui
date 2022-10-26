@@ -4,13 +4,28 @@
 #include <Boot/BootInfo.h>
 #include "Graphics.h"
 
+uint32_t *BackBuffer;
+
 bool MouseDrawn;
 uint32_t MouseCursorBuffer[16 * 16];
 uint32_t MouseCursorBufferAfter[16 * 16];
 
+void InitVideo(){
+    BackBuffer = MemoryAlloc(MBInfo->framebuffer_height * MBInfo->framebuffer_pitch);
+}
+
+void SetPixel(unsigned short X, unsigned short Y, unsigned Color){
+    *(unsigned int*)((unsigned int*)BackBuffer + X + (Y * 32)) = Color;
+}
+
 void PutPixel(int X, int Y, unsigned int Color){
     unsigned *line = (unsigned *)(MBInfo->framebuffer_addr + Y * MBInfo->framebuffer_pitch);
     line[X] = Color;
+}
+
+void Update(){
+    MemorySet(BackBuffer, 0, MBInfo->framebuffer_height * MBInfo->framebuffer_pitch);
+    MemoryCopy(MBInfo->framebuffer_addr, BackBuffer, MBInfo->framebuffer_height * MBInfo->framebuffer_pitch);
 }
 
 int GetPixel(int X, int Y){
@@ -107,7 +122,7 @@ void PutGradient(int X, int Y, int W, int H, unsigned int StartColor, unsigned i
 }
 
 void DrawDesktop(){
-    PutGradient(0, 0, 1280, 768, 0xD600A7, 0x0085FF);
+    // PutGradient(0, 0, 1280, 768, 0xD600A7, 0x0085FF);
     // uint32_t ColIn;
     // uint32_t ColOut;
     // for (uint32_t i = 0; i < 32; i++)

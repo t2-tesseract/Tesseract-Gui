@@ -18,6 +18,7 @@
 #define ICW1            0x11
 #define ICW4_8086       0x01
 
+typedef unsigned char byte;
 void InitDynamicMem();
 unsigned char Inb(unsigned short port);
 void Outb(unsigned short port, unsigned char data);

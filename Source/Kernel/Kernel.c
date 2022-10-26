@@ -22,19 +22,25 @@ void _start(multiboot_info_t* MBootInfo){
 	InitIdt();
 	InitIsr();
 	InitIrq();
-	// InitPic();
+	InitPic();
      
     InitDynamicMem();
+    InitVideo();
 
-    PutGradient(0, 0, 1280, 720, 0xD600A7, 0x0085FF);
+    MemorySet(BackBuffer, 0, MBInfo->framebuffer_height * MBInfo->framebuffer_pitch);
 
-    DrawTaskbar();
+    // SetPixel(50, 50, 0xFFFFFF);
+	Update();
 
-    TimerInstall();
-    KeyboardInstall();
-    InitPic();
-    MouseInit();
-    __asm__ __volatile__ ("sti");
+    // PutGradient(0, 0, 1280, 720, 0xD600A7, 0x0085FF);
+
+    // DrawTaskbar();
+
+    // TimerInstall();
+    // KeyboardInstall();
+    // InitPic();
+    // MouseInit();
+    // __asm__ __volatile__ ("sti");
 
     while(1){
         
